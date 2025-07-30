@@ -12,6 +12,7 @@ class DisplayResultsStreamlit:
         usecase = self.usecase
         graph = self.graph
         user_message = self.user_message
+        
         if usecase == "Basic Chatbot":
             for event in graph.stream({'messages':("user",user_message)}):
                 print(event.values())
@@ -21,3 +22,20 @@ class DisplayResultsStreamlit:
                         st.write(user_message)
                     with st.chat_message("assistant"):
                         st.write(value["messages"].content)
+                        
+        elif usecase == "Chatbot with Web":  # Fixed: was checking user_message instead of usecase
+            initial_state = {"messages":[HumanMessage(content=user_message)]}  # Fixed: properly create HumanMessage
+            res = graph.invoke(initial_state)
+            
+            for message in res['messages']:
+                if isinstance(message, HumanMessage):
+                    with st.chat_message('user'):
+                        st.write(message.content)
+                elif isinstance(message, ToolMessage):
+                    with st.chat_message("ai"):
+                        st.write("🔍 Tool Call Start")
+                        st.write(message.content)
+                        st.write("🔍 Tool Call End")
+                elif isinstance(message, AIMessage) and message.content:
+                    with st.chat_message("assistant"):
+                        st.write(message.content)

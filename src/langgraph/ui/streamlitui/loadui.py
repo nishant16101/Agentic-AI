@@ -45,5 +45,16 @@ class LoadStreamlitUI:
                     st.warning("Please enter your OpenAI API Key to proceed.")
             
             self.user_controls['selected_usecase'] = st.selectbox("Select Use Case", usecase_options)
-        
+
+            if self.user_controls["selected_usecase"] == "Chatbot with Web":
+                tavily_key = st.text_input("TAVILY API KEY", type="password")
+                self.user_controls["TAVILY_API_KEY"] = tavily_key
+                
+                # Set environment variable for Tavily
+                if tavily_key:
+                    os.environ['TAVILY_API_KEY'] = tavily_key
+                    st.session_state['TAVILY_API_KEY'] = tavily_key
+                else:
+                    st.warning("Please enter the Tavily API key")
+                    
         return self.user_controls
